@@ -1,0 +1,13 @@
+# ============================================================
+# CONCEPT: Namespace
+# Namespaces provide virtual clusters within a physical cluster.
+# All our app resources live in "taskmanager" namespace,
+# isolated from kube-system and other namespaces.
+# ============================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: taskmanager
+  labels:
+    app: taskmanager
+    environment: demo

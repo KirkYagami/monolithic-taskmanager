@@ -1,0 +1,16 @@
+# Kind cluster with port mappings for NodePort access from host machine
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: taskmanager-demo
+nodes:
+  - role: control-plane
+    # Map host ports to container ports so NodePort services are reachable
+    extraPortMappings:
+      - containerPort: 30080   # backend NodePort
+        hostPort: 30080
+        protocol: TCP
+      - containerPort: 30000   # frontend NodePort
+        hostPort: 30000
+        protocol: TCP
+  - role: worker
+  - role: worker

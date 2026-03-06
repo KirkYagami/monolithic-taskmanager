@@ -1,0 +1,38 @@
+# ============================================================
+# CONCEPT: Service — LoadBalancer
+#
+# LoadBalancer is the "production-grade" external exposure.
+# In real cloud (AWS/GCP/Azure): provisions an actual cloud LB
+# with a public IP automatically.
+#
+# In Kind (local): LoadBalancer services get "pending" EXTERNAL-IP
+# unless you install MetalLB or use port-forward.
+# We also add a nodePort so it works in Kind without MetalLB.
+#
+# Traffic flow (cloud):
+#   Internet → External IP:80 → LoadBalancer → Frontend Pods
+#
+# Traffic flow (Kind with nodePort):
+#   localhost:30000 → Kind node → Frontend Pods
+#
+# Key comparison:
+#   ClusterIP   = internal only
+#   NodePort    = external via Node IP, port 30000-32767
+#   LoadBalancer = external via dedicated IP (superset of NodePort)
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: taskmanager
+  labels:
+    app: frontend
+spec:
+  type: LoadBalancer   # Cloud: gets real external IP. Kind: use port-forward or nodePort
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      port: 80           # External port
+      targetPort: 80     # Frontend container port
+      nodePort: 30000    # Fallback for Kind (localhost:30000)

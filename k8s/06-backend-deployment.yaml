@@ -1,0 +1,72 @@
+# ============================================================
+# Spring Boot Backend — Deployment with 2 replicas
+#
+# Note replicas: 2 here — demonstrating horizontal scaling!
+# Both pods share the same mysql-service via ClusterIP.
+#
+# imagePullPolicy: Never — tells k8s to use local image
+# (required since we loaded it with: kind load docker-image)
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: taskmanager
+  labels:
+    app: backend
+spec:
+  replicas: 2    # ← Run 2 instances for HA & load distribution
+  selector:
+    matchLabels:
+      app: backend
+  strategy:
+    type: RollingUpdate      # Zero-downtime deployments
+    rollingUpdate:
+      maxSurge: 1            # Allow 1 extra Pod during update
+      maxUnavailable: 0      # Never go below desired replica count
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: taskmanager-backend:latest
+          imagePullPolicy: Never   # Use locally loaded image in Kind
+          ports:
+            - containerPort: 8080
+          env:
+            # Uses mysql-service DNS name — NOT an IP!
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql-service:3306/taskmanager"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-user
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+          # Wait for MySQL before accepting traffic
+          readinessProbe:
+            httpGet:
+              path: /actuator/health   # Spring Boot Actuator endpoint
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

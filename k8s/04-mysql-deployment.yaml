@@ -1,0 +1,103 @@
+# ============================================================
+# CONCEPTS: Pod → ReplicaSet → Deployment
+#
+# Pod: The container running mysql:8.0
+#
+# ReplicaSet: Ensures `replicas: 1` Pod is always running.
+#   If the Pod crashes, ReplicaSet starts a new one automatically.
+#   (MySQL typically runs as 1 replica — use StatefulSet for HA)
+#
+# Deployment: Manages the ReplicaSet. Gives us:
+#   - Declarative updates
+#   - Rolling updates (zero-downtime)
+#   - Rollback history
+#
+# selector.matchLabels MUST match template.metadata.labels
+# This is how the Deployment "owns" its Pods.
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: taskmanager
+  labels:
+    app: mysql
+spec:
+  replicas: 1   # Only 1 MySQL — stateful workloads prefer StatefulSet
+  selector:
+    matchLabels:
+      app: mysql   # ← Deployment manages Pods with this label
+  template:
+    # Everything below is the Pod template
+    metadata:
+      labels:
+        app: mysql   # ← Must match selector.matchLabels above
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            # Reference our Secret — never hardcode passwords here!
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-password
+          # Health check — k8s won't route traffic until this passes
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - -u
+                - taskuser
+                - -ptaskpass
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - -u
+                - taskuser
+                - -ptaskpass
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          # Mount persistent storage
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc   # Reference our PVC from 03-mysql-pvc.yaml

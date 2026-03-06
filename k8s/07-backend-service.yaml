@@ -1,0 +1,35 @@
+# ============================================================
+# CONCEPT: Service — NodePort
+#
+# NodePort exposes the service on a static port (30000-32767)
+# on EVERY node in the cluster. Accessible from outside!
+#
+# Traffic flow:
+#   Your laptop:30080
+#     → Kind node (control-plane container):30080
+#       → backend-service (ClusterIP)
+#         → Backend Pod (port 8080)   [load balanced across replicas!]
+#
+# Compare with ClusterIP (mysql-service):
+#   ClusterIP  = internal only, stable virtual IP
+#   NodePort   = external access via Node IP + static port
+#
+# For Kind, we mapped containerPort 30080 → hostPort 30080
+# in kind-cluster.yaml so localhost:30080 works.
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: taskmanager
+  labels:
+    app: backend
+spec:
+  type: NodePort    # ← Key difference from mysql-service!
+  selector:
+    app: backend    # Routes to Pods with label app=backend (both replicas!)
+  ports:
+    - name: http
+      port: 8080        # ClusterIP port (used internally by frontend)
+      targetPort: 8080  # Backend container port
+      nodePort: 30080   # External port on each Node (30000-32767)

@@ -1,0 +1,21 @@
+# ============================================================
+# CONCEPT: PersistentVolumeClaim (PVC)
+# Pods are ephemeral — when they die, their data is lost.
+# A PVC requests durable storage that survives Pod restarts.
+# This replaces the Docker Compose "volumes: mysql_data:"
+#
+# PV  = the actual storage (like a physical disk)
+# PVC = a request/claim for that storage (like renting the disk)
+# Kind automatically provisions a PV for each PVC (hostPath).
+# ============================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: taskmanager
+spec:
+  accessModes:
+    - ReadWriteOnce    # Only one node can mount at a time (fine for MySQL)
+  resources:
+    requests:
+      storage: 1Gi
