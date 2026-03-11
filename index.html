@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My AWS S3 Website</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #232f3e, #ff9900);
+      color: white;
+      padding: 60px 40px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      opacity: 0.85;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 4px 16px;
+      font-size: 0.85rem;
+      margin-top: 16px;
+      letter-spacing: 1px;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 50px auto;
+      padding: 0 24px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      border-top: 4px solid #ff9900;
+      transition: transform 0.2s;
+    }
+
+    .card:hover { transform: translateY(-4px); }
+
+    .card .icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+      color: #232f3e;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .info-box {
+      background: #232f3e;
+      color: white;
+      border-radius: 12px;
+      padding: 32px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .info-box h2 {
+      font-size: 1.4rem;
+      color: #ff9900;
+      margin-bottom: 10px;
+    }
+
+    .info-box p {
+      opacity: 0.8;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 32px;
+      color: #888;
+      font-size: 0.85rem;
+      border-top: 1px solid #e0e0e0;
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>☁️ My First S3 Website</h1>
+    <p>Hosted entirely on Amazon S3 — no server required</p>
+    <div class="badge">AWS - STATIC WEBSITE HOSTING</div>
+  </header>
+
+  <main>
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon">🪣</div>
+        <h3>Amazon S3</h3>
+        <p>This entire website lives in an S3 bucket. HTML, CSS, and all assets are stored as objects.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🌍</div>
+        <h3>Globally Accessible</h3>
+        <p>Once the bucket policy is set, anyone on the internet can access this site — no EC2 needed.</p>
+      </div>
+      <div class="card">
+        <div class="icon">💰</div>
+        <h3>Nearly Free</h3>
+        <p>S3 static hosting costs pennies per month for small sites. Pay only for storage and bandwidth.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚡</div>
+        <h3>Infinitely Scalable</h3>
+        <p>S3 handles millions of requests automatically. No servers to scale, patch, or restart.</p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h2>🎉 If you can see this page, it worked!</h2>
+      <p>
+        This page is being served directly from an S3 bucket via the S3 static website endpoint.<br/>
+        Try visiting a page that doesn't exist to see the custom error page →
+        <strong style="color:#ff9900;"> /missing-page</strong>
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    Hosted on Amazon S3 &nbsp;|&nbsp; AWS Lab &nbsp;|&nbsp; Built with HTML &amp; CSS
+  </footer>
+
+</body>
+</html>
