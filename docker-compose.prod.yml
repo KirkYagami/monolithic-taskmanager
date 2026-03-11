@@ -19,6 +19,15 @@ services:
 
   backend:
     image: ${DOCKERHUB_USERNAME}/taskmanager-backend:${IMAGE_TAG}
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/taskmanager?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: taskuser
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8080:8080"
     environment:

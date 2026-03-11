@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: TaskManager
+
+server:
+  port: 8080
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY:YnjzzdSTuC4/2q4L3h+mCasDKRFiD2Ah469DEF2PUw0=}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,beans,prometheus
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+info:
+  app:
+    name: Task Manager API
+    description: A comprehensive task management system
+    version: 1.0.0
