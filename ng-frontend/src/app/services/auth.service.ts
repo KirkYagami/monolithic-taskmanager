@@ -15,7 +15,7 @@ export class AuthService {
   private router = inject(Router);
   private store  = inject(TodoStore);
 
-  private API = 'http://localhost:8080/api/auth';
+  private API = '/api/auth';;
 
   // ── Signals ───────────────────────────────────────────────────
   private _user = signal<AuthResponse | null>(this.loadUser());
