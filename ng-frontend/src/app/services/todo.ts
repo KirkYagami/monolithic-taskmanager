@@ -7,7 +7,7 @@ import { Todo, TaskResponse, FilterType, Priority } from '../models/todo.model';
 export class TodoStore {
 
   private http    = inject(HttpClient);
-  private API = '/api/auth';;
+  private API = '/api/tasks';
 
   // ── Private state ────────────────────────────────────────────
   private _todos  = signal<Todo[]>([]);
